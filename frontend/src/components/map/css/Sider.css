@@ -1,0 +1,27 @@
+.map-modal .mapSider {
+    background-color: white;
+    height: 100%;
+}
+.map-modal .selectBlock{
+    height:150px;
+    background-color: #FA8C16;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+@media (max-width: 950px) {
+    .map-modal .selectBlock{
+        height: auto;
+        justify-content: flex-start;
+    }
+
+    .map-modal .mapSider {
+        flex: 0 0 auto!important;
+        min-width: 100%!important;
+        max-width: 100%!important;
+        width: 100%!important;
+        height: auto;
+    }
+}

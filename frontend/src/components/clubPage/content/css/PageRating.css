@@ -1,0 +1,11 @@
+.page-rating {
+    margin-bottom: 51px;
+}
+
+.page-rating .feedback {
+    font-size: 14px;
+    color: #0050B3;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 14px;
+}

@@ -1,0 +1,88 @@
+.page-sider {
+    background: white;
+}
+
+.page-sider .address {
+    color: #2D4C68;
+    height: 24px;
+    margin: 0;
+    display: flex;
+    font-weight: 600;
+}
+
+.page-sider .address .text {
+    opacity: 0.6;
+}
+
+.page-sider .address-icon {
+    font-size: 1.5em;
+    color: #FFA62C;
+    margin-right: 11px;
+    margin-left: 4px;
+}
+
+.page-sider .map {
+    width: 100%;
+    height: 170px;
+    margin-top: 24px;
+}
+
+.page-sider .map > img {
+    width: 100%;
+}
+
+.page-sider .age,
+.page-sider .center {
+    margin-top: 32px;
+}
+
+.page-sider .sider-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2D4C68;
+}
+
+.page-sider .age .years {
+     opacity: 0.6;
+ }
+
+.page-sider .center .name {
+    color: #2E69C9;
+}
+
+
+@media (max-width: 1264px) {
+    .page-sider {
+        flex: 0 0 260px !important;
+        min-width: 260px !important;
+        max-width: 260px !important;
+        width: 260px !important;
+    }
+
+    @media (max-width: 950px) {
+        .page-sider {
+            align-self: center;
+        }
+
+        .page-sider .address {
+            justify-content: center;
+        }
+
+        .page-sider {
+            margin-top: 30px;
+            flex: 0 0 364px !important;
+            min-width: 364px !important;
+            max-width: 364px !important;
+            width: 364px !important;
+        }
+
+        @media (max-width: 480px) {
+            .page-sider {
+                flex: 0 0 280px !important;
+                min-width: 280px !important;
+                max-width: 280px !important;
+                width: 280px !important;
+            }
+        }
+    }
+}

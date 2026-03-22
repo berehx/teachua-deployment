@@ -1,0 +1,51 @@
+.primitive-card {
+    height: 236px;
+    box-shadow: 0px 12px 40px rgba(1, 16, 44, 0.08);
+    border-radius: 16px;
+    margin-top: 30px;
+}
+
+.primitive-card .content {
+    padding: 24px 20px 24px 20px;
+}
+
+.primitive-card .content .name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: #002766;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 28px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.primitive-card .content .description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    color: #2D4C68;
+    font-weight: 400;
+    font-size: 14px;
+    height: 72px;
+    line-height: 24px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.primitive-card .content .details {
+    color: #2E69C9;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    cursor: pointer;
+}
+
+.primitive-card .content .details:hover {
+    color: #1890FF;
+}
+
+.primitive-card .content .details .arrow {
+    margin-left: 11px;
+}

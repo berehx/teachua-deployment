@@ -1,0 +1,5 @@
+@media (max-width: 950px) {
+    .club-page {
+        flex-direction: column!important;
+    }
+}

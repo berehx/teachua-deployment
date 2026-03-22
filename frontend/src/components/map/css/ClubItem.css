@@ -1,0 +1,54 @@
+.map-modal .club-item {
+    border-bottom: 1px solid #F5F5F5;
+    height: 85px;
+    box-sizing: content-box;
+    padding: 20px 25px;
+    cursor: pointer;
+}
+
+.map-modal .club-item:hover {
+    background: #FAFAFA;
+}
+
+.map-modal .club-item .title {
+    display: flex;
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 15px;
+    align-items: center;
+}
+
+.map-modal .club-item .name {
+    color: #002766;
+    margin-left: 10px;
+}
+
+.map-modal .club-item .address {
+    display: flex;
+    align-items: center;
+}
+
+.map-modal .club-item .address .text {
+    color: #2D4C68;
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+.map-modal .address-icon {
+    font-size: 1.5em;
+    color: #FFA62C;
+    margin-right: 10px;
+}
+
+
+@media (max-width: 950px) {
+    .map-modal .club-item .title {
+        font-size: 15px;
+    }
+
+    .map-modal .club-item {
+        border-right: 1px solid #F5F5F5;
+        border-bottom: none;
+        min-width: 230px;
+    }
+}

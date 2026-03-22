@@ -1,0 +1,17 @@
+.user-content {
+  height: 100vh;
+  top: 80px;
+  background: url("../css/user-background.png");
+}
+
+.content-title {
+  padding-top: 65px;
+  padding-left: 250px;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 32px;
+
+  color: #2D4C68;
+
+}

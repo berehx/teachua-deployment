@@ -1,0 +1,152 @@
+.footer {
+  padding: 49px 121px;
+  justify-content: space-between;
+  display: flex;
+  background: #fff;
+}
+
+.footer .footer-social {
+  width: 200px;
+  margin-right: 20px;
+}
+
+.footer .social-media {
+  margin-top: 32px;
+  width: 100%;
+  display: flex;
+}
+
+.footer .social-media .links {
+  display: flex;
+  justify-content: space-between;
+  width: 200px;
+}
+
+.footer .social-media .icon {
+  color: #0D2C95;
+  font-size: 1.3em;
+}
+
+.footer .footer-social .footer-logo {
+  background: url("/images/logofooter.png") 0 0 / contain no-repeat;
+  height: 40px;
+  width: 140px;
+  vertical-align: middle;
+}
+
+.footer .description {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  margin-top: 16px;
+  color: #2D4C68;
+}
+
+.footer .description .text {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer .footer-social .footer-social-logos {
+  background: url("/images/social.png") no-repeat;
+  width: 160px;
+  height: 22px;
+  margin-top: 30px;
+}
+
+.footer .footer-partners .sponsors {
+  margin-top: 35px;
+}
+
+.footer-partners .logo {
+  width: 80px;
+  height: 80px;
+  margin-right: 10px;
+}
+
+.footer-partners .logo img {
+  width: 100%;
+  height: 100%;
+}
+
+.footer .article {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 24px;
+  color: #002766;
+}
+
+.footer-donate .footer-donate-description {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  margin-top: 16px;
+  color: #2D4C68;
+}
+
+.footer-donate .donate-button {
+  width: 220px;
+  height: 40px;
+  font-size: 16px;
+  border-radius: 6px;
+  background: #FA8C16;
+  margin-top: 28px;
+  color: #FFFFFF;
+}
+
+.donate-button:hover {
+  color: white;
+  background: #FFA940;
+}
+
+@media (max-width: 970px) {
+  .footer {
+    height: 100%;
+    flex-wrap: wrap;
+  }
+
+  .footer .footer-social {
+    margin-right: 20px;
+  }
+
+  .footer .footer-social {
+      order: 1;
+  }
+
+  .footer .footer-partners {
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .footer-social .article {
+    text-align: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .footer {
+    padding: 30px;
+  }
+}
+
+
+@media (max-width: 585px) {
+  .footer {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .footer .footer-social,
+  .footer .footer-donate {
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .footer .footer-donate,
+  .footer .footer-social {
+    margin-top: 30px;
+  }
+}

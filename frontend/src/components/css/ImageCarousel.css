@@ -1,0 +1,45 @@
+.carousel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: auto;
+    max-width: 650px;
+    height: 143px;
+}
+
+.carousel::-webkit-scrollbar { display: none; }
+
+.carousel:hover > .arrow {
+    display: block;
+}
+
+.carousel .carousel-cell {
+    width: 145px;
+    height: 100%;
+}
+
+.carousel .ant-image {
+    height: 100%;
+    transition: 0.5s;
+    margin-right: 25px;
+    user-select: none;
+    transform: translateX(0);
+}
+
+.carousel .arrow {
+    display: none;
+    position: absolute;
+    font-size: 30px;
+    color: #FA8C16;
+    z-index: 1;
+    user-select: none;
+}
+
+.carousel .arrow:hover {
+    color: #FFA940;
+}
+
+.carousel .next {
+    right: 0;
+}
+

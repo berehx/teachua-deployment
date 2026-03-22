@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mariadb:10.6
+    restart: always
+    environment:
+      MARIADB_DATABASE: teachua
+      MARIADB_USER: teachua_user
+      MARIADB_PASSWORD: password123
+      MARIADB_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db_data:/var/lib/mysql
+
+  backend:
+    build: ./teachua-backend-berehx
+    ports:
+      - "8080"
+    environment:
+      - JDBC_DRIVER=org.mariadb.jdbc.Driver
+      - DATASOURCE_URL=jdbc:mariadb://db:3306/teachua
+      - DATASOURCE_USER=teachua_user
+      - DATASOURCE_PASSWORD=password123
+    depends_on:
+      - db
+
+  frontend:
+    build: ./teachua-frontend-berehx
+    ports:
+      - "3000:3000"
+    environment:
+      - ROOT_SERVER=http://backend:8080/dev
+    depends_on:
+      - backend
+  
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend

@@ -1,0 +1,25 @@
+.map-modal .clubList {
+    width: 100%;
+    height: 80%;
+    overflow-x: scroll;
+}
+
+.map-modal .clubList::-webkit-scrollbar {
+    width: 8px;
+    height: 5px;
+    background-color: white;
+}
+
+.map-modal .clubList::-webkit-scrollbar-thumb {
+    background-color: #808080;
+    border-radius: 15px;
+    opacity: 0.5;
+}
+
+@media (max-width: 950px) {
+    .map-modal .clubList {
+        display: flex;
+        height: auto;
+        overflow-y: auto;
+    }
+}

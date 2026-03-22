@@ -1,0 +1,57 @@
+.page-content {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+    margin-right: 15px;
+}
+
+.page-content .carousel {
+    margin-bottom: 54px;
+}
+
+.page-content .upper,
+.lower {
+    max-width: 690px;
+    display: block;
+}
+
+.page-content .lower {
+    margin-top: 32px;
+}
+
+.page-content .title {
+    color: #002766;
+    font-size: 28px;
+    line-height: 32px;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.page-content .description {
+    color: #2D4C68;
+    font-size: 18px;
+    line-height: 28px;
+    opacity: 0.9;
+}
+
+.page-content .button-box {
+    margin-top: 44px;
+}
+
+.page-content .apply-button {
+    width: 236px;
+    height: 40px;
+    font-size: 16px;
+    background: #FA8C16;
+    color: white;
+    border-radius: 6px;
+}
+.page-content .apply-button:hover {
+    background: #FFA940;
+}
+
+@media (max-width: 950px) {
+    .page-content {
+        width: 100%!important;
+    }
+}

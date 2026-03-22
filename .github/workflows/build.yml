@@ -38,7 +38,8 @@ jobs:
       - name: Deploy images
         run: |
           cd /home/potter/projects
-          git pull origin main
+          git fetch origin main
+          git reset --hard origin/main
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
           docker compose pull
           docker compose up -d

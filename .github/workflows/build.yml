@@ -32,16 +32,13 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:latest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build-and-push
     steps:
-      - name: Deploy to VM via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd ~/projects/teachua-deployment
-            docker compose pull
-            docker compose up -d
+      - name: Deploy images
+        run: |
+          cd ~/projects/teachua-deployment
+          git pull origin main
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker compose pull
+          docker compose up -d

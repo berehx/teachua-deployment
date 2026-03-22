@@ -37,7 +37,7 @@ jobs:
     steps:
       - name: Deploy images
         run: |
-          cd ~/projects/teachua-deployment
+          cd /home/potter/projects
           git pull origin main
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
           docker compose pull

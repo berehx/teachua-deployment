@@ -43,6 +43,8 @@ jobs:
           context: ./frontend
           push: true
           platforms: linux/amd64,linux/arm64
+          build-args: |
+            REACT_APP_ROOT_SERVER=http://${{ secrets.SERVER_IP }}:8080
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:${{ steps.vars.outputs.sha_short }}

@@ -13,9 +13,10 @@ services:
       - ./db_data:/var/lib/mysql
 
   backend:
-    build: ./teachua-backend-berehx
+    image: bereh/teachua-backend:latest
+    restart: always
     ports:
-      - "8080"
+      - "8080:8080"
     environment:
       - JDBC_DRIVER=org.mariadb.jdbc.Driver
       - DATASOURCE_URL=jdbc:mariadb://db:3306/teachua
@@ -25,16 +26,18 @@ services:
       - db
 
   frontend:
-    build: ./teachua-frontend-berehx
+    image: bereh/teachua-frontend:latest
+    restart: always
     ports:
       - "3000:3000"
     environment:
       - ROOT_SERVER=http://backend:8080/dev
     depends_on:
       - backend
-  
+
   nginx:
     image: nginx:latest
+    restart: always
     ports:
       - "80:80"
     volumes:

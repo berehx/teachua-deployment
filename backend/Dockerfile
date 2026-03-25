@@ -1,11 +1,11 @@
-FROM maven:3.8.4-openjdk-17 AS build
+FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
+COPY . .
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:17-jre
+FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY --from=build /app/target/*.jar /app/app.jar
+COPY --from=build /app/target/*.jar app.jar
+RUN ls -lh app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

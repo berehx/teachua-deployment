@@ -32,7 +32,7 @@ jobs:
         with:
           context: ./backend
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:${{ steps.vars.outputs.sha_short }}
@@ -42,7 +42,7 @@ jobs:
         with:
           context: ./frontend
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:${{ steps.vars.outputs.sha_short }}

@@ -25,14 +25,17 @@ services:
       - db
 
   frontend:
-    build: ./teachua-frontend-berehx
+    build:
+      context: ./teachua-frontend-berehx
+      args:
+        - REACT_APP_ROOT_SERVER=/dev
+    environment:
+      - REACT_APP_ROOT_SERVER=/dev
     ports:
       - "3000:3000"
-    environment:
-      - ROOT_SERVER=http://backend:8080/dev
     depends_on:
       - backend
-  
+
   nginx:
     image: nginx:latest
     ports:

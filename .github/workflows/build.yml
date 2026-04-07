@@ -1,23 +1,56 @@
-name: Build and Push to Docker Hub
+name: Build, Scan and Push
 
 on:
   push:
-    branches: [ "main", "feat/azure-key-vault" ]
+    branches: [ "main", "feat/security-scanning" ]
 
 jobs:
-  build-and-push:
+  build-scan-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/maven@master
+        continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Build Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          load: true
+          tags: bereh/teachua-backend:scan
+
+      - name: Build Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          load: true
+          tags: bereh/teachua-frontend:scan
+
+      - name: Run Trivy scanner (Backend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'bereh/teachua-backend:scan'
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL'
+
+      - name: Run Trivy scanner (Frontend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'bereh/teachua-frontend:scan'
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL'
 
       - name: Login to Docker Hub
         uses: docker/docker-login-action@v3
@@ -25,23 +58,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Backend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          tags: bereh/teachua-backend:latest
-
-      - name: Build and push Frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          push: true
-          tags: bereh/teachua-frontend:latest
+      - name: Push Final Images
+        run: |
+          docker tag bereh/teachua-backend:scan bereh/teachua-backend:latest
+          docker tag bereh/teachua-frontend:scan bereh/teachua-frontend:latest
+          docker push bereh/teachua-backend:latest
+          docker push bereh/teachua-frontend:latest
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: build-scan-push
     steps:
       - name: Deploy to Azure via SSH
         uses: appleboy/ssh-action@v1.0.3

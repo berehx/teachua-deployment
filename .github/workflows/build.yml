@@ -1,8 +1,8 @@
-name: Build, Scan and Push
+name: Build, Scan and Deploy
 
 on:
   push:
-    branches: [ "main", "feat/security-scanning" ]
+    branches: [ "main", "feat/splunk-logging", "feat/security-scanning" ]
 
 jobs:
   build-scan-push:
@@ -83,6 +83,8 @@ jobs:
             DB_PASS=$(az keyvault secret show --name "DB-PASSWORD" --vault-name "teachua-kv-f55799c7" --query value -o tsv)
             echo "DB_PASSWORD=$DB_PASS" > .env
             echo "DB_ROOT_PASSWORD=root_password" >> .env
+            echo "SPLUNK_TOKEN=${{ secrets.SPLUNK_TOKEN }}" >> .env
+            echo "SPLUNK_URL=${{ secrets.SPLUNK_URL }}" >> .env
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker compose pull
             docker compose up -d

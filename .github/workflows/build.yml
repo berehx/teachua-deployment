@@ -45,7 +45,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.AZURE_VM_IP }}
-          username: ${{ secrets.USERNAME }}
+          username: azureuser
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
             cd /home/azureuser/teachua-deployment

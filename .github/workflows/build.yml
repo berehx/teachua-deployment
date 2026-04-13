@@ -2,7 +2,11 @@ name: Build, Scan and Deploy
 
 on:
   push:
-    branches: [ "main", "feat/splunk-logging", "feat/security-scanning" ]
+    branches: 
+      - "main"
+      - "feat/**"
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build-scan-push:

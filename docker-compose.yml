@@ -37,6 +37,7 @@ services:
       - "3000:3000"
     environment:
       - ROOT_SERVER=http://backend:8080/dev
+      - NODE_OPTIONS=
     depends_on:
       - backend
     logging:

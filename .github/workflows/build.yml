@@ -80,7 +80,7 @@ jobs:
             git fetch origin ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
-            echo "DB_ROOT_PASSWORD=root_password" >> .env
+            echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
             echo "SPLUNK_TOKEN=${{ secrets.SPLUNK_TOKEN }}" >> .env
             echo "SPLUNK_URL=${{ secrets.SPLUNK_URL }}" >> .env
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin

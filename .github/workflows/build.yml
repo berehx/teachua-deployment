@@ -77,15 +77,12 @@ jobs:
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
             cd /home/azureuser/teachua-deployment
-            git fetch origin main
-            git reset --hard origin/main
-            
+            git fetch origin ${{ github.ref_name }}
+            git reset --hard origin/${{ github.ref_name }}
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
             echo "DB_ROOT_PASSWORD=root_password" >> .env
             echo "SPLUNK_TOKEN=${{ secrets.SPLUNK_TOKEN }}" >> .env
             echo "SPLUNK_URL=${{ secrets.SPLUNK_URL }}" >> .env
-            
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            
             docker compose pull
-            docker compose up -d
+            docker compose up -d --force-recreate

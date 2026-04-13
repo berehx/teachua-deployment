@@ -13,9 +13,9 @@ services:
       - ./db_data:/var/lib/mysql
 
   backend:
-    build: ./teachua-backend-berehx
+    image: bereh/teachua-backend:latest
     ports:
-      - "8080"
+      - "8080:8080"
     environment:
       - JDBC_DRIVER=org.mariadb.jdbc.Driver
       - DATASOURCE_URL=jdbc:mariadb://db:3306/teachua
@@ -23,15 +23,30 @@ services:
       - DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       - db
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   frontend:
-    build: ./teachua-frontend-berehx
+    image: bereh/teachua-frontend:latest
     ports:
       - "3000:3000"
     environment:
       - ROOT_SERVER=http://backend:8080/dev
+      - NODE_OPTIONS=
     depends_on:
       - backend
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   nginx:
     image: nginx:latest
@@ -42,3 +57,10 @@ services:
     depends_on:
       - frontend
       - backend
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"

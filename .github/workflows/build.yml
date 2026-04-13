@@ -44,8 +44,8 @@ jobs:
       - name: Deploy to Azure VM
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.AZURE_VM_HOST }}
-          username: ${{ secrets.AZURE_VM_USER }}
+          host: ${{ secrets.AZURE_VM_IP }}
+          username: ${{ secrets.USERNAME }}
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
             cd /home/azureuser/teachua-deployment

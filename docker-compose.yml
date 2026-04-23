@@ -5,8 +5,8 @@ services:
     environment:
       MARIADB_DATABASE: teachua
       MARIADB_USER: teachua_user
-      MARIADB_PASSWORD: password123
-      MARIADB_ROOT_PASSWORD: root_password
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -14,26 +14,50 @@ services:
 
   backend:
     image: bereh/teachua-backend:latest
+<<<<<<< HEAD
     restart: always
+=======
+>>>>>>> main
     ports:
       - "8080:8080"
     environment:
       - JDBC_DRIVER=org.mariadb.jdbc.Driver
       - DATASOURCE_URL=jdbc:mariadb://db:3306/teachua
       - DATASOURCE_USER=teachua_user
-      - DATASOURCE_PASSWORD=password123
+      - DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       - db
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   frontend:
     image: bereh/teachua-frontend:latest
+<<<<<<< HEAD
     restart: always
+=======
+>>>>>>> main
     ports:
       - "3000:3000"
     environment:
       - ROOT_SERVER=http://backend:8080/dev
+      - NODE_OPTIONS=
     depends_on:
       - backend
+<<<<<<< HEAD
+=======
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"
+>>>>>>> main
 
   nginx:
     image: nginx:latest
@@ -45,3 +69,10 @@ services:
     depends_on:
       - frontend
       - backend
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"

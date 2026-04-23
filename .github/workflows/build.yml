@@ -2,7 +2,7 @@ name: Build, Scan and Deploy
 
 on:
   push:
-    branches: [ "main", "feat/splunk-logging", "feat/security-scanning" ]
+    branches: [ "main", "feature/artifact-management", "feat/splunk-logging", "feat/security-scanning" ]
 
 jobs:
   build-scan-push:
@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -22,26 +25,16 @@ jobs:
         with:
           args: --severity-threshold=high
 
-      - name: Build Backend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          load: true
-          tags: bereh/teachua-backend:scan
-
-      - name: Build Frontend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          load: true
-          tags: bereh/teachua-frontend:scan
+      - name: Build Images for Scanning
+        run: |
+          docker build -t bereh/teachua-backend:scan ./backend
+          docker build -t bereh/teachua-frontend:scan ./frontend
 
       - name: Run Trivy scanner (Backend)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'bereh/teachua-backend:scan'
           format: 'table'
-          exit-code: '0'
           severity: 'CRITICAL'
 
       - name: Run Trivy scanner (Frontend)
@@ -49,7 +42,6 @@ jobs:
         with:
           image-ref: 'bereh/teachua-frontend:scan'
           format: 'table'
-          exit-code: '0'
           severity: 'CRITICAL'
 
       - name: Login to Docker Hub
@@ -58,12 +50,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push Final Images
-        run: |
-          docker tag bereh/teachua-backend:scan bereh/teachua-backend:latest
-          docker tag bereh/teachua-frontend:scan bereh/teachua-frontend:latest
-          docker push bereh/teachua-backend:latest
-          docker push bereh/teachua-frontend:latest
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build and push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:${{ steps.vars.outputs.sha_short }}
+
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:${{ steps.vars.outputs.sha_short }}
 
   deploy:
     runs-on: ubuntu-latest

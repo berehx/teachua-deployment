@@ -14,6 +14,7 @@ services:
 
   backend:
     image: bereh/teachua-backend:latest
+    restart: always
     ports:
       - "8080:8080"
     environment:
@@ -33,6 +34,7 @@ services:
 
   frontend:
     image: bereh/teachua-frontend:latest
+    restart: always
     ports:
       - "3000:3000"
     environment:
@@ -50,6 +52,7 @@ services:
 
   nginx:
     image: nginx:latest
+    restart: always
     ports:
       - "80:80"
     volumes:

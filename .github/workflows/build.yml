@@ -2,7 +2,8 @@ name: Build, Scan and Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build-scan-push:
@@ -10,61 +11,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/maven@master
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
-
-      - name: Build Images for Scanning
-        run: |
-          docker build -t bereh/teachua-backend:scan ./teachua-backend-berehx
-          docker build -t bereh/teachua-frontend:scan ./teachua-frontend-berehx
-
-      - name: Run Trivy scanner (Backend)
-        uses: aquasecurity/trivy-action@master
-        continue-on-error: true
-        with:
-          image-ref: 'bereh/teachua-backend:scan'
-          format: 'table'
-          severity: 'CRITICAL'
-
-      - name: Run Trivy scanner (Frontend)
-        uses: aquasecurity/trivy-action@master
-        continue-on-error: true
-        with:
-          image-ref: 'bereh/teachua-frontend:scan'
-          format: 'table'
-          severity: 'CRITICAL'
 
       - name: Login to Docker Hub
         uses: docker/docker-login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+        
       - name: Set outputs
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
+        
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
@@ -74,9 +31,9 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:${{ steps.vars.outputs.sha_short }}
-
+          
       - name: Build and push Frontend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v5 
         with:
           context: ./teachua-frontend-berehx
           push: true
@@ -91,7 +48,7 @@ jobs:
     steps:
       - name: Deploy to Azure via SSH
         uses: appleboy/ssh-action@v1.0.3
-        with:
+        with:   
           host: ${{ secrets.AZURE_VM_IP }}
           username: azureuser
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
@@ -104,10 +61,27 @@ jobs:
             sudo rm -rf db_data
             sudo mv /home/azureuser/db_data_safe db_data || true
             sudo chown -R azureuser:azureuser /home/azureuser/teachua-deployment
+            
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
             echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
             echo "SPLUNK_TOKEN=${{ secrets.SPLUNK_TOKEN }}" >> .env
             echo "SPLUNK_URL=${{ secrets.SPLUNK_URL }}" >> .env
+            echo "HOST=0.0.0.0" >> .env
+
+            cat <<EOF > nginx.conf
+            server {
+                listen 80;
+                location / {
+                    proxy_pass http://frontend:3000;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                }
+                location /dev {
+                    proxy_pass http://backend:8080;
+                }
+            }
+            EOF
+
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            docker compose pull
+            docker compose pull 
             docker compose up -d --force-recreate

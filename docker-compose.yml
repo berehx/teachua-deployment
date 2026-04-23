@@ -1,35 +1,33 @@
+version: '3.8'
+
 services:
   db:
     image: mariadb:10.6
+    container_name: teachua-db
     restart: always
     environment:
-      MARIADB_DATABASE: teachua
-      MARIADB_USER: teachua_user
-      MARIADB_PASSWORD: ${DB_PASSWORD}
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: teachua
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
-      - ./db_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
+    networks:
+      - teachua-network
 
   backend:
     image: bereh/teachua-backend:latest
     ports:
-      - "8080:8080"
+      - "8080"
     environment:
-      - JDBC_DRIVER=org.mariadb.jdbc.Driver
-      - DATASOURCE_URL=jdbc:mariadb://db:3306/teachua
-      - DATASOURCE_USER=teachua_user
-      - DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/teachua
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${DB_ROOT_PASSWORD}
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.mariadb.jdbc.Driver
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MariaDB106Dialect
+      - OTEL_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=teachua-backend
     depends_on:
       - db
-    logging:
-      driver: splunk
-      options:
-        splunk-token: "${SPLUNK_TOKEN}"
-        splunk-url: "${SPLUNK_URL}"
-        splunk-insecureskipverify: "true"
-        tag: "{{.Name}}/{{.ID}}"
 
   frontend:
     build: ./teachua-frontend-berehx
@@ -37,24 +35,15 @@ services:
       - "3000:3000"
     environment:
       - ROOT_SERVER=http://backend:8080/dev
-      - NODE_OPTIONS=
     depends_on:
       - backend
-    logging:
-      driver: splunk
-      options:
-        splunk-token: "${SPLUNK_TOKEN}"
-        splunk-url: "${SPLUNK_URL}"
-        splunk-insecureskipverify: "true"
-        tag: "{{.Name}}/{{.ID}}"
 
   nginx:
     image: nginx:latest
-    restart: always
     ports:
       - "80:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - frontend
       - backend

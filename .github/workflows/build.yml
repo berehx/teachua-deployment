@@ -5,7 +5,7 @@ on:
     branches: [ "main", "feat/azure-key-vault" ]
 
 jobs:
-  build-scan-push:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

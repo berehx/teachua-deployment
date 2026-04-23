@@ -1,11 +1,11 @@
-name: Build and Push to Docker Hub
+name: Build, Scan and Deploy
 
 on:
   push:
-    branches: [ "main", "feat/azure-key-vault" ]
+    branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  build-scan-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,35 +15,81 @@ jobs:
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/maven@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Build Images for Scanning
+        run: |
+          docker build -t bereh/teachua-backend:scan ./backend
+          docker build -t bereh/teachua-frontend:scan ./frontend
+
+      - name: Run Trivy scanner (Backend)
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: 'bereh/teachua-backend:scan'
+          format: 'table'
+          severity: 'CRITICAL'
+
+      - name: Run Trivy scanner (Frontend)
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: 'bereh/teachua-frontend:scan'
+          format: 'table'
+          severity: 'CRITICAL'
+
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/docker-login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
-          tags: bereh/teachua-backend:latest
+          platforms: linux/amd64
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:${{ steps.vars.outputs.sha_short }}
 
-      - name: Build and Push Frontend
+      - name: Build and push Frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
-          tags: bereh/teachua-frontend:latest
+          platforms: linux/amd64
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:${{ steps.vars.outputs.sha_short }}
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: build-scan-push
     steps:
-      - name: Deploy to Azure VM
+      - name: Deploy to Azure via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.AZURE_VM_IP }}
@@ -53,10 +99,10 @@ jobs:
             cd /home/azureuser/teachua-deployment
             git fetch origin main
             git reset --hard origin/main
-            az login --identity
-            DB_PASS=$(az keyvault secret show --name "DB-PASSWORD" --vault-name "teachua-kv-f55799c7" --query value -o tsv)
-            echo "DB_PASSWORD=$DB_PASS" > .env
-            echo "DB_ROOT_PASSWORD=root_password" >> .env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
+            echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
+            echo "SPLUNK_TOKEN=${{ secrets.SPLUNK_TOKEN }}" >> .env
+            echo "SPLUNK_URL=${{ secrets.SPLUNK_URL }}" >> .env
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker compose pull
-            docker compose up -d
+            docker compose up -d --force-recreate

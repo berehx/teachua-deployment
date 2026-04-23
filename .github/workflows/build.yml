@@ -40,7 +40,6 @@ jobs:
           tags: bereh/teachua-frontend:latest
 
   deploy:
-    needs: build-scan-push
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:

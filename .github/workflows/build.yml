@@ -2,11 +2,7 @@ name: Build, Scan and Deploy
 
 on:
   push:
-<<<<<<< HEAD
-    branches: [ "main", "feature/artifact-management" ]
-=======
-    branches: [ "main", "feat/splunk-logging", "feat/security-scanning" ]
->>>>>>> main
+    branches: [ "main", "feature/artifact-management", "feat/splunk-logging", "feat/security-scanning" ]
 
 jobs:
   build-scan-push:
@@ -15,14 +11,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-<<<<<<< HEAD
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-=======
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -34,26 +25,16 @@ jobs:
         with:
           args: --severity-threshold=high
 
-      - name: Build Backend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          load: true
-          tags: bereh/teachua-backend:scan
-
-      - name: Build Frontend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          load: true
-          tags: bereh/teachua-frontend:scan
+      - name: Build Images for Scanning
+        run: |
+          docker build -t bereh/teachua-backend:scan ./backend
+          docker build -t bereh/teachua-frontend:scan ./frontend
 
       - name: Run Trivy scanner (Backend)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'bereh/teachua-backend:scan'
           format: 'table'
-          exit-code: '0'
           severity: 'CRITICAL'
 
       - name: Run Trivy scanner (Frontend)
@@ -61,17 +42,14 @@ jobs:
         with:
           image-ref: 'bereh/teachua-frontend:scan'
           format: 'table'
-          exit-code: '0'
           severity: 'CRITICAL'
 
->>>>>>> main
       - name: Login to Docker Hub
         uses: docker/docker-login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-<<<<<<< HEAD
       - name: Set outputs
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
@@ -81,7 +59,7 @@ jobs:
         with:
           context: ./backend
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-backend:${{ steps.vars.outputs.sha_short }}
@@ -91,35 +69,15 @@ jobs:
         with:
           context: ./frontend
           push: true
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            REACT_APP_ROOT_SERVER=http://${{ secrets.SERVER_IP }}:8080
+          platforms: linux/amd64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/teachua-frontend:${{ steps.vars.outputs.sha_short }}
-=======
-      - name: Push Final Images
-        run: |
-          docker tag bereh/teachua-backend:scan bereh/teachua-backend:latest
-          docker tag bereh/teachua-frontend:scan bereh/teachua-frontend:latest
-          docker push bereh/teachua-backend:latest
-          docker push bereh/teachua-frontend:latest
->>>>>>> main
 
   deploy:
     runs-on: ubuntu-latest
     needs: build-scan-push
     steps:
-<<<<<<< HEAD
-      - name: Deploy images
-        run: |
-          cd /home/potter/projects
-          git fetch origin ${{ github.ref_name }}
-          git reset --hard origin/${{ github.ref_name }}
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker compose pull
-          docker compose up -d
-=======
       - name: Deploy to Azure via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -137,4 +95,3 @@ jobs:
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker compose pull
             docker compose up -d --force-recreate
->>>>>>> main

@@ -14,10 +14,7 @@ services:
 
   backend:
     image: bereh/teachua-backend:latest
-<<<<<<< HEAD
     restart: always
-=======
->>>>>>> main
     ports:
       - "8080:8080"
     environment:
@@ -37,10 +34,7 @@ services:
 
   frontend:
     image: bereh/teachua-frontend:latest
-<<<<<<< HEAD
     restart: always
-=======
->>>>>>> main
     ports:
       - "3000:3000"
     environment:
@@ -48,8 +42,6 @@ services:
       - NODE_OPTIONS=
     depends_on:
       - backend
-<<<<<<< HEAD
-=======
     logging:
       driver: splunk
       options:
@@ -57,7 +49,6 @@ services:
         splunk-url: "${SPLUNK_URL}"
         splunk-insecureskipverify: "true"
         tag: "{{.Name}}/{{.ID}}"
->>>>>>> main
 
   nginx:
     image: nginx:latest

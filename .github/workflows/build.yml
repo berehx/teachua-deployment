@@ -97,8 +97,12 @@ jobs:
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
             cd /home/azureuser/teachua-deployment
-            git fetch origin main
-            git reset --hard origin/main
+            sudo mv db_data /home/azureuser/db_data_safe || true
+            sudo git fetch origin main
+            sudo git reset --hard origin/main
+            sudo rm -rf db_data
+            sudo mv /home/azureuser/db_data_safe db_data || true
+            sudo chown -R azureuser:azureuser .git
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
             echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
             echo "SPLUNK_TOKEN=${{ secrets.SPLUNK_TOKEN }}" >> .env

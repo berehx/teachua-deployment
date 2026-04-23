@@ -102,7 +102,7 @@ jobs:
             sudo git reset --hard origin/main
             sudo rm -rf db_data
             sudo mv /home/azureuser/db_data_safe db_data || true
-            sudo chown -R azureuser:azureuser .git
+            sudo chown -R azureuser:azureuser /home/azureuser/teachua-deployment
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
             echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
             echo "SPLUNK_TOKEN=${{ secrets.SPLUNK_TOKEN }}" >> .env

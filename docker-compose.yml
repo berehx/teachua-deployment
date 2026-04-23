@@ -15,9 +15,9 @@ services:
       - teachua-network
 
   backend:
-    image: ${DOCKERHUB_USERNAME}/teachua-backend:${IMAGE_TAG:-latest}
-    container_name: teachua-backend
-    restart: always
+    build: ./teachua-backend-berehx
+    ports:
+      - "8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/teachua
       - SPRING_DATASOURCE_USERNAME=root
@@ -28,22 +28,18 @@ services:
       - OTEL_SERVICE_NAME=teachua-backend
     depends_on:
       - db
-      - otel-collector
-    networks:
-      - teachua-network
 
   frontend:
-    image: ${DOCKERHUB_USERNAME}/teachua-frontend:${IMAGE_TAG:-latest}
-    container_name: teachua-frontend
-    restart: always
+    build: ./teachua-frontend-berehx
+    ports:
+      - "3000:3000"
     environment:
-      - NODE_OPTIONS="" # Оце вилікує твій фронтенд
-    networks:
-      - teachua-network
+      - ROOT_SERVER=http://backend:8080/dev
+    depends_on:
+      - backend
 
   nginx:
     image: nginx:latest
-    container_name: teachua-nginx
     ports:
       - "80:80"
     volumes:

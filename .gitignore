@@ -2,4 +2,3 @@ node_modules/
 target/
 *.log
 .DS_Store
-db_data/

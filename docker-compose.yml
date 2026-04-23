@@ -5,37 +5,41 @@ services:
     environment:
       MARIADB_DATABASE: teachua
       MARIADB_USER: teachua_user
-      MARIADB_PASSWORD: password123
-      MARIADB_ROOT_PASSWORD: root_password
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - ./db_data:/var/lib/mysql
 
   backend:
-    build: ./teachua-backend-berehx
+    image: bereh/teachua-backend:latest
     ports:
-      - "8080"
+      - "8080:8080"
     environment:
       - JDBC_DRIVER=org.mariadb.jdbc.Driver
       - DATASOURCE_URL=jdbc:mariadb://db:3306/teachua
       - DATASOURCE_USER=teachua_user
-      - DATASOURCE_PASSWORD=password123
+      - DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       - db
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   frontend:
-    build:
-      context: ./teachua-frontend-berehx
-      args:
-        - REACT_APP_ROOT_SERVER=/dev
-    environment:
-      - REACT_APP_ROOT_SERVER=/dev
+    build: ./teachua-frontend-berehx
     ports:
       - "3000:3000"
+    environment:
+      - ROOT_SERVER=http://backend:8080/dev
     depends_on:
       - backend
-
+  
   nginx:
     image: nginx:latest
     ports:
@@ -45,3 +49,10 @@ services:
     depends_on:
       - frontend
       - backend
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"

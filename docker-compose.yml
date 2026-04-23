@@ -13,8 +13,7 @@ services:
       - ./db_data:/var/lib/mysql
 
   backend:
-    image: bereh/teachua-backend:latest
-    restart: always
+    build: ./teachua-backend-berehx
     ports:
       - "8080:8080"
     environment:
@@ -60,10 +59,3 @@ services:
     depends_on:
       - frontend
       - backend
-    logging:
-      driver: splunk
-      options:
-        splunk-token: "${SPLUNK_TOKEN}"
-        splunk-url: "${SPLUNK_URL}"
-        splunk-insecureskipverify: "true"
-        tag: "{{.Name}}/{{.ID}}"

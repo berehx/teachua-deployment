@@ -15,7 +15,7 @@ services:
       - teachua-network
 
   backend:
-    build: ./teachua-backend-berehx
+    image: bereh/teachua-backend:latest
     ports:
       - "8080"
     environment:
@@ -47,30 +47,10 @@ services:
     depends_on:
       - frontend
       - backend
-    networks:
-      - teachua-network
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
-    container_name: otel-collector
-    restart: always
-    command: ["--config=/etc/otel-config.yaml"]
-    volumes:
-      - ./otel-config.yaml:/etc/otel-config.yaml
-    networks:
-      - teachua-network
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    container_name: jaeger
-    ports:
-      - "16686:16686"
-    networks:
-      - teachua-network
-
-networks:
-  teachua-network:
-    driver: bridge
-
-volumes:
-  db_data:
+    logging:
+      driver: splunk
+      options:
+        splunk-token: "${SPLUNK_TOKEN}"
+        splunk-url: "${SPLUNK_URL}"
+        splunk-insecureskipverify: "true"
+        tag: "{{.Name}}/{{.ID}}"

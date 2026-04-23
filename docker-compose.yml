@@ -32,7 +32,7 @@ services:
         tag: "{{.Name}}/{{.ID}}"
 
   frontend:
-    image: bereh/teachua-frontend:latest
+    build: ./teachua-frontend-berehx
     ports:
       - "3000:3000"
     environment:
@@ -50,6 +50,7 @@ services:
 
   nginx:
     image: nginx:latest
+    restart: always
     ports:
       - "80:80"
     volumes:

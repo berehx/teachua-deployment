@@ -36,8 +36,8 @@ jobs:
 
       - name: Build Images for Scanning
         run: |
-          docker build -t bereh/teachua-backend:scan ./backend
-          docker build -t bereh/teachua-frontend:scan ./frontend
+          docker build -t bereh/teachua-backend:scan ./teachua-backend-berehx
+          docker build -t bereh/teachua-frontend:scan ./teachua-frontend-berehx
 
       - name: Run Trivy scanner (Backend)
         uses: aquasecurity/trivy-action@master
@@ -68,7 +68,7 @@ jobs:
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: ./teachua-backend-berehx
           push: true
           platforms: linux/amd64
           tags: |
@@ -78,7 +78,7 @@ jobs:
       - name: Build and push Frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
+          context: ./teachua-frontend-berehx
           push: true
           platforms: linux/amd64
           tags: |

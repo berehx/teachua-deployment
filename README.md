@@ -16,4 +16,6 @@ Cloud-native infrastructure and automated CI/CD pipeline for the TeachUA platfor
 * **Scalability:** Horizontal Pod Autoscaling readiness.
 * **Observability:** Full-stack distributed tracing and centralized logging.
 
-> **Note:** Production environment (teacherio.pp.ua) was successfully validated and then decommissioned to optimize cloud resource costs. See the "Live Demo" section for video proof.
+> **Note:** Production environment (teacherio.pp.ua) was successfully validated and then decommissioned to optimize cloud resource costs. 
+> 
+> 📺 **[Watch Live Video Demo](https://drive.google.com/file/d/1iFZX_7O24gfE2eIbIk_nOYo9tXV3Rlg5/view?usp=sharing)**

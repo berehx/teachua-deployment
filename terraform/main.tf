@@ -154,6 +154,12 @@ resource "azurerm_key_vault_access_policy" "vm_policy" {
 
 resource "azurerm_key_vault_secret" "db_password" {
   name         = "DB-PASSWORD"
-  value        = "MySuperSecretPass123!"
+  value        = var.db_password
   key_vault_id = azurerm_key_vault.teachua_kv.id
+}
+
+variable "db_password" {
+  description = "Administrator password for the database"
+  type        = string
+  sensitive   = true
 }
